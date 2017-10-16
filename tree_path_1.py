@@ -1,11 +1,16 @@
 # coding: utf-8
 
+from copy import deepcopy
+
 
 class Node(object):
     def __init__(self, var, left=None, right=None):
         self.var = var
         self.left = left
         self.right = right
+
+    def __repr__(self):
+        return self.var
 
 
 node1 = Node(1)
@@ -41,25 +46,41 @@ node5.right = node10
 
 # 从根开始遍历成数组， 然后逐个比对数组中的元素直到出现不相等的为止
 
-def get_path(root, node):
-    path = [root]
-    while path[-1] != node:
-        path.append(node)
-    return path
+result = []
+
+
+def build_path(root, node, path=[]):
+    global result
+    _path = deepcopy(path)
+    _path.append(root)
+
+    if root == node:
+        result = _path
+        return
+
+    if root.left:
+        build_path(root.left, node, _path)
+
+    if root.right:
+        build_path(root.right, node, _path)
 
 
 if __name__ == "__main__":
-    path_a = get_path(node1, node7)
-    print path_a
-    path_b = get_path(node1, node10)
-    print path_b
-    i = 0
-    while True:
-        if path_a[i] != path_b[i]:
-            break
-        i += 1
+    build_path(node1, node10)
+    path_a = deepcopy(result)
+    result = []
+    build_path(node1, node7)
+    path_b = deepcopy(result)
 
-    # TODO
-    print i
-    print path_a[i:]
-    print path_b[i:]
+    print [item.var for item in path_a]
+    print [item.var for item in path_b]
+
+    for idx in range(len(path_a)):
+        if path_a[idx].var != path_b[idx].var:
+            break
+
+    print idx
+    apath = path_a[idx-1:]
+    apath.reverse()
+    apath.extend(path_b[idx:])
+    print [item.var for item in apath]
